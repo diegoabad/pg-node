@@ -1,25 +1,33 @@
-const pool = require('../config/db');
+const productsServices = require('../services/productsServices');
 
 const productsController = {
   findAll: async (req, res) => {
-    const { rows } = await pool.query('SELECT name, price FROM products');
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron productos' });
+    try {
+      const products = await productsServices.findAll();
+      if (!products) {
+        return res.status(404).json({ message: 'No se encontraron productos' });
+      }
+      res.status(200).json({ products: products });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-    res.status(200).json({ products: rows });
   },
 
   findById: async (req, res) => {
     const { id } = req.params;
-    const { rows } = await pool.query(
-      `SELECT * FROM products WHERE id = ${id}`
-    );
-    if (rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: `No se encontro el producto ${id}` });
+    try {
+      const product = await productsServices.findById(id);
+      if (!product) {
+        return res
+          .status(404)
+          .json({ message: `No se encontro el producto ${id}` });
+      }
+      res.status(200).json(product);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-    res.status(200).json({ product: rows[0] });
   },
 
   create: async (req, res) => {
@@ -27,27 +35,33 @@ const productsController = {
     if (!name || !price) {
       return res.status(400).json({ message: 'Faltan datos' });
     }
-    const { rows } = await pool.query(
-      `INSERT INTO products (name, price) VALUES ('${name}', ${price}) RETURNING *`
-    );
-
-    if (rows.length === 0) {
-      return res.status(400).json({ message: 'No se pudo crear el producto' });
+    try {
+      const productCreated = await productsServices.create(name, price);
+      res
+        .status(201)
+        .json({ product: productCreated, message: 'Producto creado' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-    res.status(201).json({ product: rows[0], message: 'Producto creado' });
   },
 
   delete: async (req, res) => {
     const { id } = req.params;
-    const { rows } = await pool.query(
-      `DELETE FROM products WHERE id = ${id} RETURNING *`
-    );
-    if (rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: `No se encontro el producto ${id}` });
+    try {
+      const productDeleted = await productsServices.delete(id);
+      if (!productDeleted) {
+        return res
+          .status(404)
+          .json({ message: `No se encontro el producto ${id}` });
+      }
+      res
+        .status(200)
+        .json({ product: productDeleted, message: 'Producto eliminado' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-    res.status(200).json({ product: rows[0], message: 'Producto eliminado' });
   },
 
   edit: async (req, res) => {
@@ -56,15 +70,20 @@ const productsController = {
     if (!name || !price) {
       return res.status(400).json({ message: 'Faltan datos' });
     }
-    const { rows } = await pool.query(
-      `UPDATE products SET name = '${name}', price = ${price} WHERE id = ${id} RETURNING *`
-    );
-    if (rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: `No se encontro el producto ${id}` });
+    try {
+      const productUpdated = await productsServices.edit(id, name, price);
+      if (!productUpdated) {
+        return res
+          .status(404)
+          .json({ message: `No se encontro el producto ${id}` });
+      }
+      res
+        .status(200)
+        .json({ product: productUpdated, message: 'Producto actualizado' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
-    res.status(200).json({ product: rows[0], message: 'Producto actualizado' });
   },
 };
 
