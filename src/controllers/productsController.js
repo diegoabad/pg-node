@@ -3,7 +3,13 @@ const productsServices = require('../services/productsServices');
 const productsController = {
   findAll: async (req, res) => {
     try {
-      const products = await productsServices.findAll();
+      const { limit, page, orderBy, orderDirection } = req.query;
+      const products = await productsServices.findAll(
+        limit,
+        page,
+        orderBy,
+        orderDirection
+      );
       if (!products) {
         return res.status(404).json({ message: 'No se encontraron productos' });
       }

@@ -2,11 +2,21 @@ const pool = require('../config/db');
 const productsQueries = require('../queries/productsQueries');
 
 const productsServices = {
-  findAll: async () => {
+  findAll: async (limit, page, orderBy = 'id', orderDirection = 'ASC') => {
     try {
-      const { rows } = await pool.query(productsQueries.selectAllProducts);
-      return rows;
+      const offset = (page - 1) * limit; //limit = 5   page = 2   offset = 5
+      console.log({ orderBy, orderDirection, limit, offset });
+      const { rows: products } = await pool.query(
+        productsQueries.selectAllProducts(
+          limit,
+          offset,
+          orderBy,
+          orderDirection
+        )
+      );
+      return products;
     } catch (error) {
+      console.error(error);
       throw new Error('Error al buscar todos los productos: ', error);
     }
   },
