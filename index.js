@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./src/config/db');
 const productsRoute = require('./src/routes/productsRoute');
+const usersRoute = require('./src/routes/usersRoute');
 const app = express();
 
 // Importar rutas
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/products', productsRoute);
+app.use('/users', usersRoute);
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
