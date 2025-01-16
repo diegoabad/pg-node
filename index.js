@@ -21,12 +21,14 @@ pool.connect().then(() => {
 app.get('/', (req, res) => {
   res.send('Hola mundo');
 });
-
 app.use('/products', productsRoute);
 app.use('/users', usersRoute);
 
 // Configuración del puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = server;

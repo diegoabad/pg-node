@@ -2,7 +2,6 @@ const productsQueries = {
   selectAllProducts: (limit, offset, orderBy, orderDirection) => {
     return `SELECT id, name, price FROM productos ORDER BY ${orderBy} ${orderDirection} LIMIT ${limit} OFFSET ${offset}`;
   },
-
   selectProductById: 'SELECT * FROM productos WHERE id = $1',
   insertProduct:
     'INSERT INTO productos (name, price) VALUES ($1, $2) RETURNING *',
